@@ -139,6 +139,10 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix 
             npm audit --audit-level=critical
+      - run:
+          name: re-audit fix
+          command: npm audit fix --audit-level=critical --force
+          when: on_fail
 
 #   deploy-infrastructure:
 #     docker:
