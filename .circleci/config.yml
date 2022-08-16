@@ -119,9 +119,7 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+    
 
   scan-backend:
     docker:
@@ -141,7 +139,10 @@ jobs:
             npm audit --audit-level=critical
       - run:
           name: re-audit fix
-          command: npm audit fix --audit-level=critical --force
+          command: |
+            cd backend
+            npm i
+            npm audit fix --audit-level=critical --force
           when: on_fail
 
 #   deploy-infrastructure:
