@@ -45,7 +45,7 @@ jobs:
     steps:
       - slack/notify:
           
-          channel: Hussein Badran
+          channel: [Hussein Badran]
           event: always
           template: basic_fail_1
           
