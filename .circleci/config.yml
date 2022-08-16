@@ -1,6 +1,7 @@
 version: 2.1
 orbs: 
   slack: circleci/slack@4.10.1
+  node: 'circleci/node:4.1'
 
 
   
@@ -43,22 +44,11 @@ jobs:
       - image: 'cimg/base:stable'
     steps:
       - slack/notify:
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*This is a text notification*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
-          event: always
+          
+          channel: Hussein Badran
+          event: fail
+          template: basic_fail_1
+          
 
 
 
