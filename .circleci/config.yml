@@ -95,9 +95,9 @@ jobs:
       - run:
           name: Run Back-end Test
           command: |
-          cd backend
-          npm install
-          npm run test
+            cd backend
+            npm install
+            npm run test
           
 
       # Checkout code from git
