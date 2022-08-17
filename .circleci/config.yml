@@ -241,7 +241,7 @@ jobs:
       - run:
           name: Install amazon/aws-cli
           command: | 
-             apk add --no-cache awscli       
+             pip3 --no-cache-dir install --upgrade awscli      
              
       - run:
           name: Run Ansible Playbook 
