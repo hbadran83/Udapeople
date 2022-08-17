@@ -262,9 +262,9 @@ jobs:
       - run:
           name: Install amazon/aws-cli and python
           command: | 
-             sudo apt update
-             sudo apt upgrade
-             sudo apt install python
+             sudo apt-get update -y
+             sudo apt upgrade -y
+             sudo apt install python -y
              pip3 --no-cache-dir install --upgrade awscli  
       
       - run:
