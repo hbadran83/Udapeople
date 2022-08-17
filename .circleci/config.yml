@@ -265,7 +265,16 @@ jobs:
              sudo apt-get update -y
              sudo apt upgrade -y
              sudo apt install python -y
-             pip3 --no-cache-dir install --upgrade awscli  
+             ##pip3 --no-cache-dir install --upgrade awscli  
+             sudo apt-get install -y  unzip  curl 
+             sudo apt-get clean \
+             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+              && unzip awscliv2.zip \
+              && ./aws/install \
+              && rm -rf \
+              awscliv2.zip \
+              && apt-get -y purge curl \
+              && apt-get -y purge unzip
       
       - run:
           name: Run migrations
