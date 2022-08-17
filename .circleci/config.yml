@@ -216,14 +216,19 @@ jobs:
           name: Install Ansible 
           command: |
              apk add --update ansible 
-             apt install awscli
+
+      - run:
+          name: Install amazon/aws-cli
+          command: | 
+             apk add --no-cache aws-cli       
+             
       - run:
           name: Run Ansible Playbook 
           command: |
              cd .circleci/ansible
              ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure      
-
+      - destroy_environment
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
