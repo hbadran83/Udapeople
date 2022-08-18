@@ -244,7 +244,8 @@ jobs:
           command: |
               cd backend
               npm cache clean --force
-              rm -rf node_modules && rm ./package-lock.json && npm install
+              rm -rf node_modules && npm install
+              npm install npm@latest -g
               npm install
               npm audit fix --force --audit-level=critical
               npm audit fix --force --audit-level=critical
