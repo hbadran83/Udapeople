@@ -292,6 +292,8 @@ jobs:
      # Here's where you will add some code to rollback on failure      
       - destroy-environment
       - revert-migrations   
+  
+  
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -313,7 +315,9 @@ jobs:
                 sudo apt-get install -y nodejs
                 # Use n version manager to use Node.js v13.8.0
                 sudo npm install -g n
-                sudo n 13.8.0    
+                sudo n 13.8.0
+
+      
 
       - run:
           name: Get backend url
@@ -346,7 +350,6 @@ jobs:
       - add_ssh_keys:
               # You can get this ID in the section where you registered the SSH Key
               fingerprints: ["dd:f6:9d:23:7a:5e:ac:25:58:31:a5:17:e0:0c:ef:4f"]
-      # attach workspace
       - attach_workspace:
           at: ~/   
       - install_awscli
@@ -368,11 +371,16 @@ jobs:
           command: |
             cd backend
             npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
+            
+            cd backend
+            tar -czf artifact.tar.gz dist/* package*
+            cd .circleci
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            # cd ..
+            # # Zip the directory
+            # tar -C backend -czvf artifact.tar.gz .
+            # cd .circleci/ansible
+            # echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             # your code here
