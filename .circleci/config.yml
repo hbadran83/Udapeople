@@ -241,7 +241,18 @@ jobs:
              sudo apt upgrade -y
              sudo apt install python python3-pip -y
              pip3 --no-cache-dir install --upgrade awscli  
-             
+
+
+      - run: 
+          name: "Install Node.js 13"
+          command: |
+                # Install Node.js LTS version as our base Node.js version
+                curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+                sudo apt-get install -y nodejs
+                # Use n version manager to use Node.js v13.8.0
+                sudo npm install -g n
+                sudo n 13.8.0    
+                            
       - run:
           name: Run migrations
           command: |
@@ -256,10 +267,8 @@ jobs:
           command: |   
               if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
               then
-                  # If you are using memstash.io, generate the token "7933fe63-4687-4fa1-8426-aa25aa1730ec" on the website
-                  #curl -H "Content-Type: text/plain" -H "token: 7933fe63-4687-4fa1-8426-aa25aa1730ec" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
-                  # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                  curl https://kvdb.io/322hcbkmGnV3ESh3jCDMHr/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                 
+                  curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi      
      # Here's where you will add some code to rollback on failure      
       - destroy-environment
