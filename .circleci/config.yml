@@ -6,6 +6,25 @@ orbs:
 
   
 commands:
+
+  install_awscli:
+    description: Install AWS CLI v2
+    steps:
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  install_ansible:
+      description: Install Ansible
+      steps:
+        - run:
+            name: Install Ansible
+            command: |
+              python3 -m pip install --user ansible
+
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     #parameters:
@@ -276,21 +295,15 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
-       - image: amazon/aws-cli
+       - image: cimg/python:3.10
     steps:
       
       - checkout
       - attach_workspace:
          at: ~/
       # Checkout code from git
-      - run:
-          name: Install dependencies
-          command: |
-            yum install python
-            yum install ansible
-            yum install nodejs
-            yum install npm
-            yum install awscli
+      - install_awscli
+      - install_ansible
 
       - run:
           name: Get backend url
@@ -316,7 +329,7 @@ jobs:
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
+      - image: cimg/python:3.10
 
     steps:
       - checkout
@@ -326,13 +339,8 @@ jobs:
       # attach workspace
       - attach_workspace:
           at: ~/   
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
-      - run:
-          name: Install dependencies ## tar, gzip, ansible, nodejs, and npm.
-          command: |
-            yum install tar gzip ansible nodejs npm
+      - install_awscli
+      - install_ansible
       - run:
           name: Deploy backend
           command: |
