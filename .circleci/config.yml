@@ -116,12 +116,7 @@ jobs:
             cd backend
             npm install
             npm run test
-          
-
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
-            
+                     
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -155,13 +150,7 @@ jobs:
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
-      # - run:
-      #     name: re-audit fix
-      #     command: |
-      #       cd backend
-      #       npm i
-      #       npm audit fix --audit-level=critical --force
-      #     when: on_fail
+  
 
   deploy-infrastructure:
     docker:
