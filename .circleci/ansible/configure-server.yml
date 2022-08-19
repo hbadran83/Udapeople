@@ -8,9 +8,9 @@
   become_user: root  
   gather_facts: false
   vars:
-    - ansible_python_interpreter: /usr/bin/python3
-    - ansible_host_key_checking: false
-    - ansible_stdout_callback: yaml
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_host_key_checking: false
+    ansible_stdout_callback: yaml
 
   pre_tasks:
     - name: "wait 600 seconds for target connection to become reachable/usable."
@@ -21,9 +21,9 @@
 
       # Your code here
     - name: "install python for Ansible."
-      become: true
-      ansible.builtin.command:
-        cmd: python3 -m pip install --user ansible    
+      apt:
+          name: python3
+          update_cache: yes  
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
 
@@ -48,3 +48,4 @@
 
   roles:
     - configure-server
+    - configure-prometheus-node-exporter
