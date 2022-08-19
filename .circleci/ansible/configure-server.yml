@@ -23,7 +23,7 @@
     - name: "install python for Ansible."
       become: true
       ansible.builtin.command:
-        cmd: apt install python    
+        cmd: python3 -m pip install --user ansible    
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
 
