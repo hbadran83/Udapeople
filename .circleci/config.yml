@@ -379,14 +379,16 @@ jobs:
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
       - destroy-environment
       - revert-migrations 
 #   smoke-test:
 #     docker:
-#       # Lightweight Docker image
+#       # image: cimg/python:3.10
 #       - image: alpine:latest
 #       # Checkout code from git
+#       - checkout
 #       - run:
 #           name: Install dependencies
 #           command: |
