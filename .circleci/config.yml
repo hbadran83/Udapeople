@@ -24,6 +24,21 @@ commands:
             name: Install Ansible
             command: |
               python3 -m pip install --user ansible
+  
+  install_nodejs:
+    description: Install nodejs 13
+    steps:
+        - run:
+            name: Install nodejs on docker image
+            command: |
+                # Install Node.js LTS version as our base Node.js version
+                curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+                sudo apt-get install -y nodejs
+                # Use n version manager to use Node.js v13.8.0
+                sudo npm install -g n
+                sudo n 13.8.0    
+
+
 
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -78,7 +93,7 @@ jobs:
 
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -96,7 +111,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -113,7 +128,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -129,7 +144,7 @@ jobs:
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -143,7 +158,7 @@ jobs:
                      
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -228,15 +243,7 @@ jobs:
           at: ~/
       - install_ansible
       - install_awscli
-      # - run:
-      #     name: Install Ansible 
-      #     command: |
-      #        apk add --update ansible 
-
-      # - run:
-      #     name: Install amazon/aws-cli
-      #     command: | 
-      #        pip3 --no-cache-dir install --upgrade awscli      
+        
              
       - run:
           name: Run Ansible Playbook 
@@ -254,6 +261,7 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -263,17 +271,10 @@ jobs:
              sudo apt upgrade -y
              sudo apt install python python3-pip -y
              pip3 --no-cache-dir install --upgrade awscli  
+       
 
-
-      - run: 
-          name: "Install Node.js 13"
-          command: |
-                # Install Node.js LTS version as our base Node.js version
-                curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-                sudo apt-get install -y nodejs
-                # Use n version manager to use Node.js v13.8.0
-                sudo npm install -g n
-                sudo n 13.8.0    
+      
+                
                             
       - run:
           name: Run migrations
@@ -334,7 +335,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm install
+            ##npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
@@ -386,31 +387,48 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - destroy-environment
       - revert-migrations 
-#   smoke-test:
-#     docker:
-#       # image: cimg/python:3.10
-#       - image: alpine:latest
-#       # Checkout code from git
-#       - checkout
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
-        # - destroy-environment
-        # - revert-migrations 
+
+
+  smoke-test:
+    docker:
+       - image: alpine:latest
+
+    steps:
+        - checkout  
+        - run:
+            name: Install dependecies
+            command: |
+              yum install curl nodejs npm awscli -y
+        - run:
+            name: Backend smoke test.
+            command: |
+                # Fetch and prepare the BACKEND_IP env var
+                      export API_URL="http://${BACKEND_IP}:3030"
+                      echo "${API_URL}"
+                      if curl "${API_URL}/api/status" | grep "ok"
+                      then
+                          return 0
+                      else
+                          return 1
+                           fi
+        - destroy-environment
+        - revert-migrations              
+        - run:
+            name: Frontend smoke test.
+            command: |
+              # your code here
+              URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+              echo ${URL} 
+              if curl -s ${URL} | grep "Welcome"
+              then
+                  # Change this to 0 after the job fails
+                return 1
+              else
+                return 1
+              fi
+      # Here's where you will add some code to rollback on failure  
+        - destroy-environment
+        - revert-migrations 
 
 
 
@@ -478,10 +496,10 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
       - notify:

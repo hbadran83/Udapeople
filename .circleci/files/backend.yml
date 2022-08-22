@@ -11,7 +11,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub UdaPeople-${ID}
-      GroupDescription: Allow port 22 and port 3030.
+      GroupDescription: Allow ports 22,3030,9100,9090
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -43,3 +43,10 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
+  
+  
+  InstanceEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref EC2Instance
