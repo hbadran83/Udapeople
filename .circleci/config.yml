@@ -398,11 +398,9 @@ jobs:
         - run:
             name: Install dependecies
             command: |
-                apk add --no-cache \
-                python3 \
-                py3-pip \
+                apk add --no-cache awscli
                 apk --no-cache add curl
-                apk add --no-cache aws-cli
+
 
         - run:
             name: Backend smoke test.
