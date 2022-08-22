@@ -391,15 +391,12 @@ jobs:
 
   smoke-test:
     docker:
-       - image: alpine:latest
+       - image: cimg/python:3.10
 
     steps:
         - checkout  
-        - run:
-            name: Install dependecies
-            command: |
-                apk add --no-cache awscli
-                apk --no-cache add curl
+        - install_awscli
+        - install_nodejs
 
 
         - run:
