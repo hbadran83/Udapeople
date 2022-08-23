@@ -233,11 +233,11 @@ jobs:
           name: fetch instance ID for quick deletion 
           command: |
                   instanceId=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend")
-                  echo $instanceId > instanceid.txt
+                  echo $instanceId > ~/project/.circleci/files/instanceid.txt 
       - persist_to_workspace:
           root: ~/
           paths:
-                - project/.circleci/instanceid.txt   
+                - project/.circleci/files/instanceid.txt   
 
   configure-infrastructure:
     docker:
