@@ -232,8 +232,9 @@ jobs:
       - run:
           name: fetch instance ID for quick deletion 
           command: |
-                  instanceId=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend")
-                  echo $instanceId > ~/project/.circleci/files/instanceid.txt 
+                  aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend" >  ~/project/.circleci/files/instanceid.txt 
+                  cat ~/project/.circleci/files/instanceid.txt 
+               
       - persist_to_workspace:
           root: ~/
           paths:
@@ -416,7 +417,7 @@ jobs:
             name: Backend smoke test.
             command: |
                 # Fetch and prepare the BACKEND_IP env var
-                      instanceId=`cat instanceid.txt`
+                      instanceId=`cat ~/project/.circleci/files/instanceid.txt`
                       export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" instance-id=$instanceId)
                       export API_URL="http://${BACKEND_IP}:3030"
                       echo "API_URL = ${API_URL}"
