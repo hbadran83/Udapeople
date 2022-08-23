@@ -437,37 +437,35 @@ jobs:
         - run:
             name: backend-smoke-test 
             command: |
-                      backend-smoke-test {
+                      
                       instanceId=`cat ~/project/.circleci/files/instanceid.txt`
-                      BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running")
+                      BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running" --output text)
                       API_URL="http://${BACKEND_IP}:3030"
                       echo "API_URL = ${API_URL}"
                       if curl "${API_URL}/api/status" | grep "ok"
                       then
-                          return 0
+                          exit 0
                       else
-                          return 1
+                          exit 1
                           fi
                       
-                      }
-                      backend-smoke-test 
+                 
         - run:
             name: Frontend smoke test.
             command: |
                
-                frontend-smoke-test {
+            
                 # your code here
                   URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
                   echo ${URL} 
                   if curl -s ${URL} | grep "Welcome"
                   then
                       # Change this to 0 after the job fails
-                    return 0
+                    exit 0
                   else
-                    return 1
+                    exit 1
                   fi
-                  }
-                  frontend-smoke-test
+             
       # Here's where you will add some code to rollback on failure  
         - destroy-environment
         - revert-migrations 
