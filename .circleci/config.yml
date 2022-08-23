@@ -222,13 +222,22 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" --output text >> ~/project/.circleci/ansible/inventory.txt
- 
+            
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
+      - run:
+          name: fetch instance ID for quick deletion 
+          command: |
+                  instanceId=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend")
+                  echo $instanceId > instanceid.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+                - project/.circleci      
 
   configure-infrastructure:
     docker:
@@ -397,13 +406,18 @@ jobs:
         - checkout  
         - install_awscli
         - install_nodejs
-         
+
+        - attach_workspace:
+            at: ~/
+
+
 
         - run:
             name: Backend smoke test.
             command: |
                 # Fetch and prepare the BACKEND_IP env var
-                      export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend")
+                      instanceId=`cat instanceid.txt`
+                      export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" instance-id=$instanceId)
                       export API_URL="http://${BACKEND_IP}:3030"
                       echo "API_URL = ${API_URL}"
                       if curl "${API_URL}/api/status" | grep "ok"
