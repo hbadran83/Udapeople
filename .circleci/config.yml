@@ -442,8 +442,8 @@ jobs:
                 return 1
               fi
       # Here's where you will add some code to rollback on failure  
-        - destroy-environment
-        - revert-migrations 
+        # - destroy-environment
+        # - revert-migrations 
 
 
 
@@ -465,8 +465,8 @@ jobs:
                   # --tags project=udapeople
 #             # your code here
 #       # Here's where you will add some code to rollback on failure  
-      - destroy-environment
-      - revert-migrations 
+      # - destroy-environment
+      # - revert-migrations 
 # cleanup:
 #     docker:
 #       # Docker image here
