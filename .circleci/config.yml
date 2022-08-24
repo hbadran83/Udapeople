@@ -417,29 +417,13 @@ jobs:
 
 
 
-        # - run:
-        #     name: Backend smoke test.
-        #      command: |
-                            
-                    #   backend-smoke-test {
-                    # # Fetch and prepare the BACKEND_IP env var
-                    # instanceId=`cat ~/project/.circleci/files/instanceid.txt`
-                    # BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running")
-                    # API_URL="http://${BACKEND_IP}:3030"
-                    # echo "API_URL = ${API_URL}"
-                    # if curl "${API_URL}/api/status" | grep "ok"
-                    # then
-                    #     return 0
-                    # else
-                    #     return 0
-                    #     fi
-                    #       }
+        
         - run:
             name: backend-smoke-test 
             command: |
                       
                       instanceId=`cat ~/project/.circleci/files/instanceid.txt`
-                      BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running" "Name=tag:Name,Values=backend-'/WorkflowID/'}" --output text)
+                      BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running" "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}}" --output text)
                       API_URL="http://${BACKEND_IP}:3030"
                       echo "API_URL = ${API_URL}"
                       if curl "${API_URL}/api/status" | grep "ok"
