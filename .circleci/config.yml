@@ -232,7 +232,7 @@ jobs:
       - run:
           name: fetch instance ID for quick deletion 
           command: |
-                  aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend" >  ~/project/.circleci/files/instanceid.txt 
+                  aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters "Name=tag:project,Values=udapeople-backend" "Name=instance-state-name,Values=running" "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" >  ~/project/.circleci/files/instanceid.txt 
                   cat ~/project/.circleci/files/instanceid.txt 
                
       - persist_to_workspace:
@@ -336,7 +336,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend")
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" )
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -504,14 +504,16 @@ jobs:
        - run:
            name: Remove old stacks and files
            command: |
-             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
              then
-                    echo "------------------------Cannot Clean UP---------------------" 
-              else
-         
+                 
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"  
+              else
+         
+
+               echo "------------------------Cannot Clean UP---------------------" 
              fi
             
 
