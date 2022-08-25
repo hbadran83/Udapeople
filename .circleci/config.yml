@@ -343,7 +343,7 @@ jobs:
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}")
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" > ~/project/.circleci/frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" > frontend/.env
             ##make sure env is correct
             
       - persist_to_workspace:
@@ -504,11 +504,11 @@ jobs:
            command: |
                
                 # Fetch the Old workflow ID
-                 OldWorkflowID=$(cat ~/project/.circleci/files/OldWorkFlowId.txt)
-                #  export OldWorkflowID=$(aws cloudformation \
+                WorkflowID=$(cat ~/project/.circleci/files/OldWorkFlowId.txt)
+                #  export WorkflowID=$(aws cloudformation \
                 #  list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                 #  --no-paginate --output text)
-                 echo OldWorkflowID: "${OldWorkflowID}"
+                 echo WorkflowID: "${WorkflowID}"
                  echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
                  # Fetch the stack names          
                  export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
@@ -519,18 +519,25 @@ jobs:
        - run:
            name: Remove old stacks and files
            command: |
-             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
-             then
-                 
-              aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
-              aws s3 rm s3://udapeople-${OldWorkflowID}
-              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"  
-              else
-         
+            
+             currentWorkflowID=${WorkflowID}
 
-               echo "------------------------Cannot Clean UP---------------------" 
-             fi
+              for i  in ${STACKS[@]}
+              do
+                Workflowid=${i: -7}
+
+                if [  $Workflowid != $currentWorkflowID ]
+                then
+                      #aws s3 rm "s3://udapeople-${Workflowid}" --recursive
+                      # aws cloudformation delete-stack --stack-name "udapeople-backend-${Workflowid}"
+                      # aws cloudformation delete-stack --stack-name "udapeople-frontend-${Workflowid}"
+                    echo   deleting S3 bucket name: udapeople-$Workflowid  
+                        else
+                                continue
+                fi
+
+                done
+
             
 
 workflows:
