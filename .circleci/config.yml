@@ -343,9 +343,9 @@ jobs:
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}")
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" >> ~/project/.circleci/frontend/.env
             ##make sure env is correct
-            cat frontend/.env
+            cat ~/project/.circleci/frontend/.env
 
       - run:
           name: Deploy frontend objects
@@ -505,7 +505,7 @@ jobs:
                 #  list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                 #  --no-paginate --output text)
                  echo OldWorkflowID: "${OldWorkflowID}"
-                 ###echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+                 echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
                  # Fetch the stack names          
                  export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                  --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
