@@ -346,10 +346,7 @@ jobs:
             echo API_URL="http://${BACKEND_IP}:3030" > frontend/.env
             ##make sure env is correct
             
-      - persist_to_workspace:
-          root: ~/
-          paths:
-                - project/.circleci/frontend/.env    
+            cat   frontend/.env
 
       - run:
           name: Deploy frontend objects
