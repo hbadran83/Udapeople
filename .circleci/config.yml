@@ -343,9 +343,13 @@ jobs:
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}")
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> ~/project/.circleci/frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" > ~/project/.circleci/frontend/.env
             ##make sure env is correct
-            cat ~/project/.circleci/frontend/.env
+            
+      - persist_to_workspace:
+          root: ~/
+          paths:
+                - project/.circleci/frontend/.env    
 
       - run:
           name: Deploy frontend objects
