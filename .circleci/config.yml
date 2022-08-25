@@ -317,6 +317,8 @@ jobs:
       - checkout
       - attach_workspace:
          at: ~/
+      - restore_cache:
+          keys: [backend-build]  
       # Checkout code from git
       - install_awscli
       - install_ansible
@@ -363,6 +365,7 @@ jobs:
 
     steps:
       - checkout
+      
       - add_ssh_keys:
               # You can get this ID in the section where you registered the SSH Key
               fingerprints: ["dd:f6:9d:23:7a:5e:ac:25:58:31:a5:17:e0:0c:ef:4f"]
@@ -370,7 +373,8 @@ jobs:
           at: ~/   
       - install_awscli
       - install_ansible
-
+      - restore_cache:
+          keys: [backend-build]  
       - run: 
           name: "Install Node.js 13"
           command: |
